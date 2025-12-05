@@ -1,0 +1,26 @@
+name: Frontend Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build step
+        run: echo "Building frontend... (placeholder for Node.js build commands)"
+
+      - name: Deploy to frontend EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.FRONTEND_PUBLIC_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            chmod +x /home/ubuntu/install_prereqs_and_deploy.sh
+            sudo /home/ubuntu/install_prereqs_and_deploy.sh frontend https://github.com/SalahSleem/uptime-kuma-frontend.git
