@@ -32,7 +32,7 @@ jobs:
                 image: louislam/uptime-kuma:latest
                 container_name: uptime-kuma
                 ports:
-                  - "3001:3001"
+                  - "80:3001"
                 volumes:
                   - uptime-kuma-data:/app/data
                 restart: unless-stopped
