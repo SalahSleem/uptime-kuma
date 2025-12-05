@@ -1,0 +1,43 @@
+name: Deploy Frontend (Uptime Kuma)
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build step
+        run: echo "Building frontend app..."
+
+      - name: Deploy to Frontend EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.FRONTEND_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Stop any existing containers
+            docker-compose down || true
+            # Create a simple docker-compose.yml if it doesn't exist
+            cat > docker-compose.yml <<EOF
+            version: '3.8'
+            services:
+              uptime-kuma:
+                image: louislam/uptime-kuma:latest
+                container_name: uptime-kuma
+                ports:
+                  - "3001:3001"
+                volumes:
+                  - uptime-kuma-data:/app/data
+                restart: unless-stopped
+            volumes:
+              uptime-kuma-data:
+            EOF
+            # Start the app
+            docker-compose up -d
